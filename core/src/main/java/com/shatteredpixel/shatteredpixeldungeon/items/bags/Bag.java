@@ -35,6 +35,8 @@ import com.watabou.utils.Bundle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.quickslot;
+
 public class Bag extends Item implements Iterable<Item> {
 
 	public static final String AC_OPEN	= "OPEN";
@@ -74,7 +76,7 @@ public class Bag extends Item implements Iterable<Item> {
 
 		//if there are any quickslot placeholders that match items in this bag, assign them
 		for (Item item : items) {
-			Dungeon.quickslot.replacePlaceholder(item);
+			quickslot.replacePlaceholder(item);
 		}
 
 		if (super.collect( container )) {
@@ -93,7 +95,11 @@ public class Bag extends Item implements Iterable<Item> {
 	public void onDetach( ) {
 		this.owner = null;
 		for (Item item : items) {
-			Dungeon.quickslot.clearItem(item);
+			//Dungeon.quickslot.clearItem(item); //mod: as the quickslot is seen as another inventory, there's no need to clear it
+			if(quickslot.contains(item)){
+				item.collect();
+			}
+			//mod: return the item to backpack and remove from bag if its on quickslot instead of dropping
 		}
 		updateQuickslot();
 	}
@@ -107,13 +113,13 @@ public class Bag extends Item implements Iterable<Item> {
 	public void grabItems( Bag container ){
 		for (Item item : container.items.toArray( new Item[0] )) {
 			if (canHold( item )) {
-				int slot = Dungeon.quickslot.getSlot(item);
+				int slot = quickslot.getSlot(item);
 				item.detachAll(container);
 				if (!item.collect(this)) {
 					item.collect(container);
 				}
 				if (slot != -1) {
-					Dungeon.quickslot.setSlot(slot, item);
+					quickslot.setSlot(slot, item);
 				}
 			}
 		}

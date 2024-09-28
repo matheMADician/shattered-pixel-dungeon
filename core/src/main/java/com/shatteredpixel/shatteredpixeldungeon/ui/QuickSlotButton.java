@@ -42,6 +42,10 @@ import com.watabou.input.GameAction;
 import com.watabou.noosa.Image;
 import com.watabou.utils.PathFinder;
 
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero;
+import static com.shatteredpixel.shatteredpixeldungeon.SPDAction.LEFT_CLICK;
+import static com.shatteredpixel.shatteredpixeldungeon.actors.Actor.TICK;
+
 public class QuickSlotButton extends Button {
 	
 	private static QuickSlotButton[] instance = new QuickSlotButton[QuickSlot.SIZE];
@@ -83,7 +87,7 @@ public class QuickSlotButton extends Button {
 		slot = new ItemSlot() {
 			@Override
 			protected void onClick() {
-				if (!Dungeon.hero.isAlive() || !Dungeon.hero.ready){
+				if (!hero.isAlive() || !hero.ready){
 					return;
 				}
 				if (targetingSlot == slotNum) {
@@ -97,9 +101,9 @@ public class QuickSlotButton extends Button {
 					}
 				} else {
 					Item item = select(slotNum);
-					if (Dungeon.hero.belongings.contains(item) && !GameScene.cancel()) {
+					if (hero.belongings.contains(item) && !GameScene.cancel()) {
 						GameScene.centerNextWndOnInvPane();
-						item.execute(Dungeon.hero);
+						item.execute(hero); //use the item. If it's waterskin or food .etc, just uses it but not torget
 						if (item.usesTargeting) {
 							useTargeting();
 						}
@@ -217,7 +221,7 @@ public class QuickSlotButton extends Button {
 	
 	@Override
 	protected void onClick() {
-		if (Dungeon.hero.ready && !GameScene.cancel()) {
+		if (hero.ready && !GameScene.cancel()) {
 			GameScene.selectItem(itemSelector);
 		}
 	}
@@ -272,6 +276,9 @@ public class QuickSlotButton extends Button {
 
 	public static void set(int slotNum, Item item){
 		Dungeon.quickslot.setSlot( slotNum , item );
+
+		hero.spendAndNext(2f); //mod: punishes opening your backpack during combat
+
 		refresh();
 
 		//Remember if the player adds the waterskin as one of their first actions.
@@ -304,7 +311,7 @@ public class QuickSlotButton extends Button {
 	
 	private void enableSlot() {
 		slot.enable(Dungeon.quickslot.isNonePlaceholder( slotNum )
-				&& (Dungeon.hero.buff(LostInventory.class) == null || Dungeon.quickslot.getItem(slotNum).keptThroughLostInventory()));
+				&& (hero.buff(LostInventory.class) == null || Dungeon.quickslot.getItem(slotNum).keptThroughLostInventory()));
 	}
 
 	public void slotMargins( int left, int top, int right, int bottom){
@@ -352,7 +359,7 @@ public class QuickSlotButton extends Button {
 	public static int autoAim(Char target, Item item){
 
 		//first try to directly target
-		if (item.targetingPos(Dungeon.hero, target.pos) == target.pos) {
+		if (item.targetingPos(hero, target.pos) == target.pos) {
 			return target.pos;
 		}
 
@@ -360,7 +367,7 @@ public class QuickSlotButton extends Button {
 		PathFinder.buildDistanceMap( target.pos, BArray.not( new boolean[Dungeon.level.length()], null ), 2 );
 		for (int i = 0; i < PathFinder.distance.length; i++) {
 			if (PathFinder.distance[i] < Integer.MAX_VALUE
-					&& item.targetingPos(Dungeon.hero, i) == target.pos)
+					&& item.targetingPos(hero, i) == target.pos)
 				return i;
 		}
 

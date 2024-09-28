@@ -1368,7 +1368,7 @@ public class GameScene extends PixelScene {
 	
 	public static void handleCell( int cell ) {
 		cellSelector.select( cell, PointerEvent.LEFT );
-	}
+	}//select the position"cell"
 	
 	public static void selectCell( CellSelector.Listener listener ) {
 		if (cellSelector.listener != null && cellSelector.listener != defaultCellListener){

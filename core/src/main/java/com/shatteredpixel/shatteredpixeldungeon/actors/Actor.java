@@ -73,7 +73,8 @@ public abstract class Actor implements Bundlable {
 	public void spendToWhole(){
 		time = (float)Math.ceil(time);
 	}
-	
+
+
 	protected void postpone( float time ) {
 		if (this.time < now + time) {
 			this.time = now + time;

@@ -1,4 +1,9 @@
 buildscript {
+    ext {
+        agp_version = '8.2.2'
+        agp_version1 = agp_version
+        agp_version2 = '7.4.0'
+    }
     repositories {
         google()
         mavenCentral()
@@ -6,7 +11,7 @@ buildscript {
     dependencies {
         //the R8 version bundled with AGP 8.1.0+ causes crashes on very old Android versions
         //This affects ICS and Lollipop at least, maybe also KitKat
-        classpath 'com.android.tools.build:gradle:8.0.2'
+        classpath "com.android.tools.build:gradle:$agp_version2"
     }
 }
 

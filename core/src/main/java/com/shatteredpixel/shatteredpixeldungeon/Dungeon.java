@@ -188,6 +188,7 @@ public class Dungeon {
 	public static QuickSlot quickslot = new QuickSlot();
 	
 	public static int depth;
+
 	//determines path the hero is on. Current uses:
 	// 0 is the default path
 	// 1 is for quest sub-floors

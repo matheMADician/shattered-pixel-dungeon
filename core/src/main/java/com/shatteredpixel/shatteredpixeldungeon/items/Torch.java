@@ -22,58 +22,111 @@
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Light;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.FlameParticle;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
+import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.noosa.particles.Emitter;
 
 import java.util.ArrayList;
 
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.quickslot;
+
 public class Torch extends Item {
 
 	public static final String AC_LIGHT	= "LIGHT";
+
+	public static final String AC_EXTINGUISH = "EXTINGUISH"; //mod:
 	
-	public static final float TIME_TO_LIGHT = 1;
-	
+	public static final float TIME_TO_LIGHT = 3; //mod: punish
+
+	public static float DURABILITY = 200;
+
+	private boolean IS_LIT = false;
 	{
 		image = ItemSpriteSheet.TORCH;
 		
-		stackable = true;
+		stackable = false; //mod: enable DURABILITY counting
 		
-		defaultAction = AC_LIGHT;
+		//defaultAction = AC_LIGHT; //mod:
 	}
-	
+
+	//mod: vvv-------------------------------------------------------------------------------------------------------vvv
+	@Override
+	public String defaultAction(){
+		return IS_LIT ? AC_EXTINGUISH : AC_LIGHT;
+	}
+
+	@Override
+	public String info() {
+		String info = desc();
+		info += "\n";
+		info += Messages.get(Torch.class , "durability" , DURABILITY);
+		return info;
+	}
+
+	//mod: ^^^-------------------------------------------------------------------------------------------------------^^^
+
 	@Override
 	public ArrayList<String> actions( Hero hero ) {
 		ArrayList<String> actions = super.actions( hero );
 		actions.add( AC_LIGHT );
+		actions.add( AC_EXTINGUISH );
 		return actions;
 	}
 	
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
-		
-		if (action.equals( AC_LIGHT )) {
-			
-			hero.spend( TIME_TO_LIGHT );
-			hero.busy();
-			
-			hero.sprite.operate( hero.pos );
-			
-			detach( hero.belongings.backpack );
-			
-			Buff.affect(hero, Light.class, Light.DURATION);
-			Sample.INSTANCE.play(Assets.Sounds.BURNING);
-			
-			Emitter emitter = hero.sprite.centerEmitter();
-			emitter.start( FlameParticle.FACTORY, 0.2f, 3 );
-			
+
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
+
+			if (action.equals(AC_LIGHT) && IS_LIT == false) { //mod:
+
+				this.IS_LIT = true; //mod:
+
+				hero.spend(TIME_TO_LIGHT);
+				hero.busy();
+
+				hero.sprite.operate(hero.pos);
+
+				//detach( hero.belongings.backpack ); //mod:
+
+				Buff.affect(hero, Light.class, DURABILITY); //mod:
+				Sample.INSTANCE.play(Assets.Sounds.BURNING);
+
+				Emitter emitter = hero.sprite.centerEmitter();
+				emitter.start(FlameParticle.FACTORY, 0.2f, 3);
+
+			} else if (action.equals(AC_EXTINGUISH) && this.IS_LIT) { //mod: adds extinguishing vvv-------------------------vvv
+
+				this.IS_LIT = false;
+
+				hero.spend(TIME_TO_LIGHT / 3);
+				hero.busy();
+
+				hero.sprite.operate(hero.pos);
+
+				if (hero.buff(Light.class) == null) { //mod: if no illumination and lit, the durability must've run out
+					this.detach(hero.belongings.backpack);
+				} else {
+					DURABILITY = hero.buff(Light.class).visualcooldown();
+					hero.buff(Light.class).detach();
+				}
+
+			}//mod:^^^---------------------------------------------------------------------------------------------------^^^
 		}
+		return true;
 	}
 	
 	@Override
