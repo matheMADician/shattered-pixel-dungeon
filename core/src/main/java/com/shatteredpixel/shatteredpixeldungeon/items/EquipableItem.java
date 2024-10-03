@@ -69,7 +69,7 @@ public abstract class EquipableItem extends Item {
 	protected static int slotOfUnequipped = -1;
 
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
 
@@ -91,6 +91,7 @@ public abstract class EquipableItem extends Item {
 		} else if (action.equals( AC_UNEQUIP )) {
 			doUnequip( hero, true );
 		}
+		return true;
 	}
 
 	@Override

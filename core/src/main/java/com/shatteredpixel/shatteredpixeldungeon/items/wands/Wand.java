@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.items.wands;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier;
@@ -106,17 +107,22 @@ public abstract class Wand extends Item {
 	}
 	
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
-		super.execute( hero, action );
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
 
-		if (action.equals( AC_ZAP )) {
-			
-			curUser = hero;
-			curItem = this;
-			GameScene.selectCell( zapper );
-			
+			if (action.equals(AC_ZAP)) {
+
+				curUser = hero;
+				curItem = this;
+				GameScene.selectCell(zapper);
+
+			}
+
 		}
+		return true;
 	}
 
 	@Override

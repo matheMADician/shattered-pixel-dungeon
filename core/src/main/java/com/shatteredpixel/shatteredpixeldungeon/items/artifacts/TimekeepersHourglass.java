@@ -85,11 +85,11 @@ public class TimekeepersHourglass extends Artifact {
 	}
 
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute(hero, action);
 
-		if (hero.buff(MagicImmune.class) != null) return;
+		if (hero.buff(MagicImmune.class) != null) return bones;
 
 		if (action.equals(AC_ACTIVATE)){
 
@@ -134,6 +134,7 @@ public class TimekeepersHourglass extends Artifact {
 						}
 				);
 		}
+		return true;
 	}
 
 	@Override

@@ -79,16 +79,17 @@ public class TalismanOfForesight extends Artifact {
 	}
 
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 		super.execute(hero, action);
 
-		if (hero.buff(MagicImmune.class) != null) return;
+		if (hero.buff(MagicImmune.class) != null) return true;
 
 		if (action.equals(AC_SCRY)){
 			if (!isEquipped(hero))  GLog.i( Messages.get(Artifact.class, "need_to_equip") );
 			else if (charge < 5)    GLog.i( Messages.get(this, "low_charge") );
 			else                    GameScene.selectCell(scry);
 		}
+		return true;
 	}
 
 	@Override

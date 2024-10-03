@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Belongings;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Enchanting;
@@ -61,16 +62,21 @@ public class Stylus extends Item {
 	}
 	
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
 
-		if (action.equals(AC_INSCRIBE)) {
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
+			if (action.equals(AC_INSCRIBE)) {
 
-			curUser = hero;
-			GameScene.selectItem( itemSelector );
-			
+				curUser = hero;
+				GameScene.selectItem(itemSelector);
+
+			}
 		}
+		return true;
 	}
 	
 	@Override

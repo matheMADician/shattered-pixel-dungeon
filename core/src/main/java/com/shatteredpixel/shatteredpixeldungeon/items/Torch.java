@@ -30,6 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.FlameParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
@@ -69,6 +70,8 @@ public class Torch extends Item {
 		String info = desc();
 		info += "\n";
 		info += Messages.get(Torch.class , "durability" , DURABILITY);
+		info += "\npos" + GameScene.tiles.pos + "\nHeroX" + GameScene.tiles.HeroX + "\nHeroY" + GameScene.tiles.HeroY +
+		"\nupdatingleft:" + GameScene.tiles.LastUpdating.left + "\nupdatingtop" + GameScene.tiles.LastUpdating.top;
 		return info;
 	}
 

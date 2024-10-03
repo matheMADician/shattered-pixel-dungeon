@@ -104,7 +104,7 @@ public class Maze {
 			
 		}
 		
-		return maze;
+		return maze; //mod: this is where the maze get output. I'll just use this then.
 	}
 	
 	private static int[] decideDirection(boolean[][] maze, int x, int y){

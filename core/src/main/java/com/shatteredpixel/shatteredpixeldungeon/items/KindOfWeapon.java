@@ -43,13 +43,13 @@ import com.watabou.utils.Random;
 
 abstract public class KindOfWeapon extends EquipableItem {
 	
-	protected static final float TIME_TO_EQUIP = 1f;
+	protected static final float TIME_TO_EQUIP = 3f; //mod: punishes equipping during combat
 
 	protected String hitSound = Assets.Sounds.HIT;
 	protected float hitSoundPitch = 1f;
 	
 	@Override
-	public void execute(Hero hero, String action) {
+	public boolean execute(Hero hero, String action) {
 		if (hero.subClass == HeroSubClass.CHAMPION && action.equals(AC_EQUIP)){
 			usesTargeting = false;
 			String primaryName = Messages.titleCase(hero.belongings.weapon != null ? hero.belongings.weapon.trueName() : Messages.get(KindOfWeapon.class, "empty"));
@@ -91,6 +91,7 @@ abstract public class KindOfWeapon extends EquipableItem {
 		} else {
 			super.execute(hero, action);
 		}
+		return true;
 	}
 
 	@Override

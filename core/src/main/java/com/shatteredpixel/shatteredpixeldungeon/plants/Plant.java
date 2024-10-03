@@ -167,7 +167,7 @@ public abstract class Plant implements Bundlable {
 		}
 		
 		@Override
-		public void execute( Hero hero, String action ) {
+		public boolean execute( Hero hero, String action ) {
 
 			super.execute (hero, action );
 
@@ -180,6 +180,7 @@ public abstract class Plant implements Bundlable {
 				hero.sprite.operate( hero.pos );
 				
 			}
+			return true;
 		}
 		
 		public Plant couch( int pos, Level level ) {

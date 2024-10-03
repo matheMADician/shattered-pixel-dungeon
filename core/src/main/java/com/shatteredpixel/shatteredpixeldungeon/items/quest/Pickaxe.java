@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.items.quest;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -97,54 +98,57 @@ public class Pickaxe extends MeleeWeapon {
 	}
 	
 	@Override
-	public void execute( final Hero hero, String action ) {
+	public boolean execute( final Hero hero, String action ) {
 
-		super.execute( hero, action );
-		
-		if (action.equals(AC_MINE)) {
-			
-			if (Dungeon.depth < 11 || Dungeon.depth > 15) {
-				GLog.w( Messages.get(this, "no_vein") );
-				return;
-			}
-			
-			for (int i = 0; i < PathFinder.NEIGHBOURS8.length; i++) {
-				
-				final int pos = hero.pos + PathFinder.NEIGHBOURS8[i];
-				if (Dungeon.level.map[pos] == Terrain.WALL_DECO) {
-				
-					hero.spend( TIME_TO_MINE );
-					hero.busy();
-					
-					hero.sprite.attack( pos, new Callback() {
-						
-						@Override
-						public void call() {
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
+			if (action.equals(AC_MINE)) {
 
-							CellEmitter.center( pos ).burst( Speck.factory( Speck.STAR ), 7 );
-							Sample.INSTANCE.play( Assets.Sounds.EVOKE );
-							
-							Level.set( pos, Terrain.WALL );
-							GameScene.updateMap( pos );
-							
-							DarkGold gold = new DarkGold();
-							if (gold.doPickUp( Dungeon.hero )) {
-								GLog.i( Messages.capitalize(Messages.get(Dungeon.hero, "you_now_have", gold.name())) );
-							} else {
-								Dungeon.level.drop( gold, hero.pos ).sprite.drop();
-							}
-							
-							hero.onOperateComplete();
-						}
-					} );
-					
-					return;
+				if (Dungeon.depth < 11 || Dungeon.depth > 15) {
+					GLog.w(Messages.get(this, "no_vein"));
+					return true;
 				}
+
+				for (int i = 0; i < PathFinder.NEIGHBOURS8.length; i++) {
+
+					final int pos = hero.pos + PathFinder.NEIGHBOURS8[i];
+					if (Dungeon.level.map[pos] == Terrain.WALL_DECO) {
+
+						hero.spend(TIME_TO_MINE);
+						hero.busy();
+
+						hero.sprite.attack(pos, new Callback() {
+
+							@Override
+							public void call() {
+
+								CellEmitter.center(pos).burst(Speck.factory(Speck.STAR), 7);
+								Sample.INSTANCE.play(Assets.Sounds.EVOKE);
+
+								Level.set(pos, Terrain.WALL);
+								GameScene.updateMap(pos);
+
+								DarkGold gold = new DarkGold();
+								if (gold.doPickUp(Dungeon.hero)) {
+									GLog.i(Messages.capitalize(Messages.get(Dungeon.hero, "you_now_have", gold.name())));
+								} else {
+									Dungeon.level.drop(gold, hero.pos).sprite.drop();
+								}
+
+								hero.onOperateComplete();
+							}
+						});
+
+						return true;
+					}
+				}
+
+				GLog.w(Messages.get(this, "no_vein"));
+
 			}
-			
-			GLog.w( Messages.get(this, "no_vein") );
-			
 		}
+		return true;
 	}
 	
 	@Override

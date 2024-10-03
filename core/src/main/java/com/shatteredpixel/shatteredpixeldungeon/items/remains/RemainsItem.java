@@ -46,7 +46,7 @@ public abstract class RemainsItem extends Item {
 	}
 
 	@Override
-	public void execute(Hero hero, String action) {
+	public boolean execute(Hero hero, String action) {
 		super.execute(hero, action);
 
 		if (action.equals(AC_USE)){
@@ -57,6 +57,7 @@ public abstract class RemainsItem extends Item {
 			hero.spendAndNext(Actor.TICK);
 			detach(hero.belongings.backpack);
 		}
+		return true;
 	}
 
 	protected abstract void doEffect(Hero hero);

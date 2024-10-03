@@ -172,7 +172,7 @@ public class Armor extends EquipableItem {
 	}
 
 	@Override
-	public void execute(Hero hero, String action) {
+	public boolean execute(Hero hero, String action) {
 
 		super.execute(hero, action);
 
@@ -198,6 +198,8 @@ public class Armor extends EquipableItem {
 			}
 			updateQuickslot();
 		}
+
+		return true;
 	}
 
 	@Override

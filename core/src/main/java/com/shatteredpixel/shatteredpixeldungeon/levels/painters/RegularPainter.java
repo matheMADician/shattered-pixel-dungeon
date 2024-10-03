@@ -30,10 +30,14 @@ import com.shatteredpixel.shatteredpixeldungeon.levels.Patch;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.connection.ConnectionRoom;
+import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.special.ModArenaRoom;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.special.SpecialRoom;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.EntranceRoom;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.StandardRoom;
 import com.shatteredpixel.shatteredpixeldungeon.levels.traps.Trap;
+
+import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import com.watabou.noosa.Game;
 import com.watabou.utils.Graph;
 import com.watabou.utils.PathFinder;
@@ -42,10 +46,16 @@ import com.watabou.utils.Random;
 import com.watabou.utils.Rect;
 import com.watabou.utils.Reflection;
 
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero;
+
 public abstract class RegularPainter extends Painter {
+
+	public final static int ModMapSize = 256; //mod: generation map size
 	
 	private float waterFill = 0f;
 	private int waterSmoothness;
@@ -108,9 +118,16 @@ public abstract class RegularPainter extends Painter {
 			
 			rightMost += padding;
 			bottomMost += padding;
-			
+
+			int w = rightMost;
+			int h = bottomMost;
+
 			//add 1 to account for 0 values
-			level.setSize(rightMost + 1, bottomMost + 1);
+
+			//level.setSize(rightMost + 10, bottomMost + 10);
+
+			level.setSize( ModMapSize , ModMapSize ); //mod: generation 256x256 map
+
 		} else {
 			//check if the level's size was already initialized by something else
 			if (level.length() == 0) return false;
@@ -131,7 +148,13 @@ public abstract class RegularPainter extends Painter {
 		}
 		
 		paintDoors( level, rooms );
-		
+
+
+		//mod: generation Add an arena in the middle of the room
+		Room r = new ModArenaRoom();
+		//r.paint(level);
+
+
 		if (waterFill > 0f) {
 			paintWater( level, rooms );
 		}
@@ -145,7 +168,29 @@ public abstract class RegularPainter extends Painter {
 		}
 		
 		decorate( level, rooms );
-		
+
+		Point mid = new Point(level.width()/2, level.height()/2);
+
+		int[] map = new int[ModMapSize*ModMapSize]; //mod: create 256x256 map
+		Arrays.fill( map,  Terrain.WALL );
+
+		for(int i=0; i<level.height(); i++){
+			for(int j=0; j<level.width(); j++){
+				map[ (i + ModMapSize / 2 - level.height() / 2) * ModMapSize + (j + ModMapSize / 2 - level.width() / 2)] =
+						level.map[i + level.width() * j]; //mod: copying to the new map
+				if ( level.map[i + level.width() * j] == Terrain.ENTRANCE ) {
+					hero.pos = (i + ModMapSize / 2 - level.height() / 2) * ModMapSize + (j + ModMapSize / 2 - level.width() / 2);
+					//mod: move to hero to the correct position XD
+				}
+			}
+		}
+
+		level.map = map;
+
+		GameScene.updateFullMap();
+
+
+
 		return true;
 	}
 	

@@ -61,7 +61,7 @@ public class TengusMask extends Item {
 	}
 	
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
 
@@ -72,6 +72,7 @@ public class TengusMask extends Item {
 			GameScene.show( new WndChooseSubclass( this, hero ) );
 			
 		}
+		return true;
 	}
 	
 	@Override

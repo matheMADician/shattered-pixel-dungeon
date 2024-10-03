@@ -114,11 +114,12 @@ public abstract class RegularLevel extends Level {
 		ArrayList<Room> initRooms = new ArrayList<>();
 		initRooms.add ( roomEntrance = new EntranceRoom());
 		initRooms.add( roomExit = new ExitRoom());
+		//mod: TODO solve initroom problem after completing levelgen
 
 		//force max standard rooms and multiple by 1.5x for large levels
 		int standards = standardRooms(feeling == Feeling.LARGE);
 		if (feeling == Feeling.LARGE){
-			standards = (int)Math.ceil(standards * 1.5f);
+			//standards = (int)Math.ceil(standards * 1.5f); //mod: removed some feelings!
 		}
 		for (int i = 0; i < standards; i++) {
 			StandardRoom s;
@@ -128,7 +129,8 @@ public abstract class RegularLevel extends Level {
 			i += s.sizeFactor()-1;
 			initRooms.add(s);
 		}
-		
+
+		/*
 		if (Dungeon.shopOnLevel())
 			initRooms.add(new ShopRoom());
 
@@ -143,14 +145,18 @@ public abstract class RegularLevel extends Level {
 			if (s instanceof PitRoom) specials++;
 			initRooms.add(s);
 		}
-		
+
+		*/  //mod: generation remove puzzle rooms
+
 		int secrets = SecretRoom.secretsForFloor(Dungeon.depth);
 		//one additional secret for secret levels
 		if (feeling == Feeling.SECRETS) secrets++;
 		for (int i = 0; i < secrets; i++) {
 			initRooms.add(SecretRoom.createRoom());
 		}
-		
+
+
+
 		return initRooms;
 	}
 	

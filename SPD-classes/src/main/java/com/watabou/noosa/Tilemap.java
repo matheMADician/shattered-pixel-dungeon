@@ -28,11 +28,15 @@ import com.watabou.glwrap.Vertexbuffer;
 import com.watabou.utils.Rect;
 import com.watabou.utils.RectF;
 
+
 import java.nio.Buffer;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
 
-public class Tilemap extends Visual {
+//import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero;
+//import com.shatteredpixel.shatteredpixeldungeon.levels.painters.RegularPainter;
+
+public class Tilemap extends Visual{
 
 	protected SmartTexture texture;
 	protected TextureFilm tileset;
@@ -55,6 +59,46 @@ public class Tilemap extends Visual {
 	private int topLeftUpdating;
 	private int bottomRightUpdating;
 
+	//mod: rendering chunk-------------------------------------------------------------------------------------------vvv
+	public Rect LastUpdating;
+	public int pos;
+	public static int HeroX;
+	public static int HeroY;
+
+	protected static int DungeonMapSizeX;
+	protected static int DungeonMapSizeY;
+	private int TileX;
+	private int TileY;
+	protected static final int ChunkSize = 8; //mod: rendering chunksize
+
+	protected static int ChunkNumX;
+	protected static int ChunkNumY;
+
+	public static void UpdateMapSize( int x, int y){
+		DungeonMapSizeX = x;
+		DungeonMapSizeY = y;
+		ChunkNumX = x / ChunkSize;
+		ChunkNumY = y / ChunkSize;
+	}
+	public static int LoadLeft(){
+		return HeroX / ChunkSize == 0 ? 0 : (HeroX / ChunkSize - 1) * ChunkSize;
+	}
+	public static int LoadUp(){
+		return HeroY / ChunkSize == 0 ? 0 : (HeroY / ChunkSize - 1) * ChunkSize;
+	}
+	public static int LoadWidth(){
+		return (HeroX / ChunkSize == ChunkNumX - 1 || HeroX / ChunkSize == 0? DungeonMapSizeX: (HeroX / ChunkSize + 1) * ChunkSize) - LoadLeft();
+	}
+	public static int LoadHeight(){
+		return (HeroY / ChunkSize == ChunkNumY - 1 || HeroY / ChunkSize == 0 ? DungeonMapSizeY: (HeroY / ChunkSize + 1) * ChunkSize) - LoadUp();
+	}
+
+	public static void UpdateHeroPos( int x, int y ){
+		HeroX = x;
+		HeroY = y;
+	}
+	//mod: rendering chunk-------------------------------------------------------------------------------------------^^^
+
 	public Tilemap( Object tx, TextureFilm tileset ) {
 
 		super( 0, 0, 0, 0 );
@@ -69,6 +113,11 @@ public class Tilemap extends Visual {
 		vertices = new float[16];
 
 		updated = new Rect();
+
+
+		//y = hero.pos / RegularPainter.ModMapSize;
+
+
 	}
 
 	public void map( int[] data, int cols ) {
@@ -77,12 +126,14 @@ public class Tilemap extends Visual {
 
 		mapWidth = cols;
 		mapHeight = data.length / cols;
-		size = mapWidth * mapHeight;
 
-		width = cellW * mapWidth;
-		height = cellH * mapHeight;
 
-		quads = Quad.createSet( size );
+		size = LoadWidth() * LoadHeight();
+
+		width = cellW * LoadWidth();
+		height = cellH * LoadHeight();
+
+		quads = Quad.createSet( size ); //mod: rendering the size of quads
 
 		updateMap();
 	}
@@ -90,7 +141,7 @@ public class Tilemap extends Visual {
 	public Image image(int x, int y){
 		if (!needsRender(x + mapWidth*y)){
 			return null;
-		} else {
+		}else{
 			Image img = new Image(texture);
 			img.frame(tileset.get(data[x + mapWidth * y]));
 			return img;
@@ -98,13 +149,15 @@ public class Tilemap extends Visual {
 	}
 
 	//forces a full update, including new buffer
-	public synchronized void updateMap(){
-		updated.set( 0, 0, mapWidth, mapHeight );
-		fullUpdate = true;
+	public synchronized void updateMap( ){
+		//updated.set( 0, 0, mapWidth, mapHeight ); //mod: change update
+		updated.set( LoadLeft(), LoadUp(), LoadLeft() + LoadWidth(), LoadUp() + LoadHeight() );
+		fullUpdate = true; //mod: no use to change?
 	}
 
 	public synchronized void updateMapCell(int cell){
-		updated.union( cell % mapWidth, cell / mapWidth );
+		//updated.union( cell % mapWidth, cell / mapWidth ); //mod: rendering Removed because this contradict with
+		//chunk rendering
 	}
 
 	private synchronized void moveToUpdating(){
@@ -117,7 +170,7 @@ public class Tilemap extends Visual {
 		moveToUpdating();
 		
 		float x1, y1, x2, y2;
-		int pos;
+		//int pos;
 		RectF uv;
 
 		y1 = cellH * updating.top;
@@ -132,12 +185,29 @@ public class Tilemap extends Visual {
 
 			for (int j=updating.left; j < updating.right; j++) {
 
+				//mod: ----------------------------------------------------------------------------------------------vvv
+				//mod: rendering there are two coordinate systems, position on the map and position on the updating
+				// rect, this used to not be the case because in SPD, the two coordinate systems coincide
+				int bufferPos = ((pos % mapWidth - LoadLeft()) + (pos / mapWidth - LoadUp()) * LoadWidth());
+
 				if (topLeftUpdating == -1)
-					topLeftUpdating = pos;
+					//topLeftUpdating = pos;
+					topLeftUpdating = bufferPos;
 
-				bottomRightUpdating = pos + 1;
+				//bottomRightUpdating = pos + 1;
+				bottomRightUpdating = bufferPos + 1;
 
-				((Buffer)quads).position(pos*16);
+				//((Buffer)quads).position(pos*16);
+
+				if (bufferPos < 0 || bufferPos * 16 >= quads.capacity()) {
+					throw new RuntimeException("Buffer position out of bounds: bufferPos:" + bufferPos + "\npos:" + pos +
+							"\nposx:" + pos % mapWidth + "\nUpdatingTop:" + updating.top + "\n UpdatingLeft:" + updating.left +
+							"\nposy:" + pos / mapWidth + "\nHeroX:" + HeroX + "\nHeroY:" + HeroY +
+							"\nLoadLeft:" + LoadLeft() + "\nLoadUp:" + LoadUp() + "\nLoadWidth:" + LoadWidth() + "\nLoadHeight:"
+							+ LoadHeight() + "\nmapWidth:" + mapWidth + "\nmapHeight:" + mapHeight + "\ni" + i + "\nj" + j);
+				}
+				((Buffer)quads).position(bufferPos * 16);
+				//mod: ----------------------------------------------------------------------------------------------^^^
 				
 				uv = tileset.get(data[pos]);
 				
@@ -213,6 +283,7 @@ public class Tilemap extends Visual {
 				}
 			}
 			topLeftUpdating = -1;
+			LastUpdating = updating;
 			updating.setEmpty();
 		}
 
@@ -227,7 +298,7 @@ public class Tilemap extends Visual {
 
 		script.camera( camera );
 
-		script.drawQuadSet( buffer, size, 0 );
+		script.drawQuadSet( buffer, size, 0 ); //mod: rendering
 
 	}
 	
@@ -241,8 +312,21 @@ public class Tilemap extends Visual {
 		if (buffer != null)
 			buffer.delete();
 	}
-
+	/*
 	protected boolean needsRender(int pos){
 		return data[pos] >= 0;
-	}
+	} //mod: THIS?
+	*/
+
+	protected boolean needsRender(int pos){
+
+		TileX = pos % mapWidth;
+		TileY = pos / mapWidth;
+
+		return (Math.abs(TileX / ChunkSize - HeroX / ChunkSize) < 2) && (Math.abs(TileY / ChunkSize - HeroY / ChunkSize) < 2);
+	} //mod: TODO chunk rendering
+
 }
+
+
+

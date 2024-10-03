@@ -21,14 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
-import com.shatteredpixel.shatteredpixeldungeon.Assets;
-import com.shatteredpixel.shatteredpixeldungeon.Badges;
-import com.shatteredpixel.shatteredpixeldungeon.Bones;
-import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
-import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
-import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
-import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
-import com.shatteredpixel.shatteredpixeldungeon.Statistics;
+import com.shatteredpixel.shatteredpixeldungeon.*;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.SacrificialFire;
@@ -169,7 +162,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 
-public class Hero extends Char {
+
+public class Hero extends Char{
 
 	{
 		actPriority = HERO_PRIO;
@@ -230,6 +224,7 @@ public class Hero extends Char {
 		
 		visibleEnemies = new ArrayList<>();
 	}
+
 	
 	public void updateHT( boolean boostHP ){
 		int curHT = HT;
@@ -882,9 +877,10 @@ public class Hero extends Char {
 	}
 	
 	private boolean actMove( HeroAction.Move action ) {
-
+		//mod: rendering used to update the hero's position and give it to the camera
 		if (getCloser( action.dst )) {
 			canSelfTrample = false;
+			GameScene.tiles.UpdateHeroPos( pos % Dungeon.level.width() , pos / Dungeon.level.width() );
 			return true;
 
 		//Hero moves in place if there is grass to trample
@@ -892,9 +888,11 @@ public class Hero extends Char {
 			canSelfTrample = false;
 			Dungeon.level.pressCell(pos);
 			spendAndNext( 1 / speed() );
+			GameScene.tiles.UpdateHeroPos( pos % Dungeon.level.width() , pos / Dungeon.level.width() );
 			return false;
 		} else {
 			ready();
+			GameScene.tiles.UpdateHeroPos( pos % Dungeon.level.width() , pos / Dungeon.level.width() );
 			return false;
 		}
 	}

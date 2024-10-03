@@ -149,7 +149,7 @@ public class GameScene extends PixelScene {
 	static GameScene scene;
 
 	private SkinnedBlock water;
-	private DungeonTerrainTilemap tiles;
+	public static DungeonTerrainTilemap tiles; //mod: change used to be non static
 	private GridTileMap visualGrid;
 	private TerrainFeaturesTilemap terrainFeatures;
 	private RaisedTerrainTilemap raisedTerrain;
@@ -1139,7 +1139,7 @@ public class GameScene extends PixelScene {
 		if (scene != null) scene.status.showStarParticles();
 	}
 
-	public static void resetMap() {
+	public static void resetMap() {//mod: rendering TODO fix this when prison boss is remade
 		if (scene != null) {
 			scene.tiles.map(Dungeon.level.map, Dungeon.level.width() );
 			scene.visualGrid.map(Dungeon.level.map, Dungeon.level.width() );
@@ -1150,7 +1150,7 @@ public class GameScene extends PixelScene {
 		updateFog();
 	}
 
-	//updates the whole map
+	//mod: updates surrounding chunks-----------------------------------------------------------------------------------
 	public static void updateMap() {
 		if (scene != null) {
 			scene.tiles.updateMap();
@@ -1161,6 +1161,19 @@ public class GameScene extends PixelScene {
 			updateFog();
 		}
 	}
+
+	//mod: update the whole map-----------------------------------------------------------------------------------------
+	public static void updateFullMap() {
+		if (scene != null) {
+			scene.tiles.updateFullMap();
+			scene.visualGrid.updateFullMap();
+			scene.terrainFeatures.updateFullMap();
+			scene.raisedTerrain.updateFullMap();
+			scene.walls.updateFullMap();
+			updateFog();
+		}
+	}
+	//mod: -------------------------------------------------------------------------------------------------------------
 	
 	public static void updateMap( int cell ) {
 		if (scene != null) {
@@ -1173,6 +1186,8 @@ public class GameScene extends PixelScene {
 			updateFog( cell, 1 );
 		}
 	}
+
+
 
 	public static void plantSeed( int cell ) {
 		if (scene != null) {

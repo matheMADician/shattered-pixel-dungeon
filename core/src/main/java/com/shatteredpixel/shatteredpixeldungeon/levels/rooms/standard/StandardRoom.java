@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
+import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.connection.TunnelRoom;
 import com.watabou.utils.Point;
 import com.watabou.utils.Random;
 import com.watabou.utils.Reflection;
@@ -35,10 +36,14 @@ public abstract class StandardRoom extends Room {
 	
 	public enum SizeCategory {
 		
-		NORMAL(4, 10, 1),
-		LARGE(10, 14, 2),
-		GIANT(14, 18, 3);
-		
+		//NORMAL(4, 10, 1),
+		//LARGE(10, 14, 2),
+		//GIANT(14, 18, 3); //mod: generation Room size
+
+		NORMAL(15, 20, 1),
+		LARGE(20, 25, 2),
+		GIANT(25, 30, 3); //mod: generation Room size
+
 		public final int minDim, maxDim;
 		public final int roomValue;
 		
@@ -154,13 +159,22 @@ public abstract class StandardRoom extends Room {
 		rooms.add(StudyRoom.class);
 		rooms.add(SuspiciousChestRoom.class);
 		rooms.add(MinefieldRoom.class);
+
 	}
 	
 	private static float[][] chances = new float[27][];
 	static {
-		chances[1] =  new float[]{10,  10,10,5, 0,0,0, 0,0,0, 0,0,0, 0,0,0,  1,0,1,0,1,0,1,1,0,0};
-		chances[2] =  new float[]{10,  10,10,5, 0,0,0, 0,0,0, 0,0,0, 0,0,0,  1,1,1,1,1,1,1,1,1,1};
-		chances[4] =  chances[3] = chances[2];
+		//chances[1] =  new float[]{10,  10,10,5, 0,0,0, 0,0,0, 0,0,0, 0,0,0,  1,0,1,0,1,0,1,1,0,0};
+		chances[1] =  new float[]{0,  6,1,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,  0,0,0,0,0,0,0,0,0,0}; //mod: generation I
+		//think only ring rooms and pipe rooms are typical in a real life sewers
+
+		//chances[2] =  new float[]{10,  10,10,5, 0,0,0, 0,0,0, 0,0,0, 0,0,0,  1,1,1,1,1,1,1,1,1,1};
+		chances[2] =  new float[]{2,  12,2,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,  0,0,0,0,0,0,0,0,0,0};
+		chances[3] =  new float[]{2,  10,2,4, 0,0,0, 0,0,0, 0,0,0, 0,0,0,  0,0,0,0,0,0,0,0,0,0};
+		chances[4] =  new float[]{2,  8,2,6, 0,0,0, 0,0,0, 0,0,0, 0,0,0,  0,0,0,0,0,0,0,0,0,0};
+		//chances[4] =  chances[3] = chances[2];
+		//pipes decrease and open rooms increase
+
 		chances[5] =  new float[]{10,  10,10,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,  0,0,0,0,0,0,0,0,0,0};
 
 		chances[6] =  new float[]{10,  0,0,0, 10,10,5, 0,0,0, 0,0,0, 0,0,0,  1,1,1,1,1,1,1,1,1,1};

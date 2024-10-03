@@ -38,13 +38,20 @@ public class EntranceRoom extends StandardRoom {
 	
 	@Override
 	public int minWidth() {
-		return Math.max(super.minWidth(), 5);
+
+		//return Math.max(super.minWidth(), 5);
+		Random rn = new Random();
+
+		return rn.Int(2)*2+1;//1 or 3
 	}
 	
 	@Override
 	public int minHeight() {
-		return Math.max(super.minHeight(), 5);
-	}
+
+		//return Math.max(super.minHeight(), 5);
+
+		return minWidth();
+	} //mod: generation make entrance and end room as small as the pipes
 
 	@Override
 	public boolean canMerge(Level l, Point p, int mergeTerrain) {

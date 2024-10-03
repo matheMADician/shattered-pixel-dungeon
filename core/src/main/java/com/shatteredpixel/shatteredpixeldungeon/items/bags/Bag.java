@@ -58,7 +58,7 @@ public class Bag extends Item implements Iterable<Item> {
 	}
 	
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
 
@@ -67,6 +67,7 @@ public class Bag extends Item implements Iterable<Item> {
 			GameScene.show( new WndQuickBag( this ) );
 			
 		}
+		return true;
 	}
 	
 	@Override

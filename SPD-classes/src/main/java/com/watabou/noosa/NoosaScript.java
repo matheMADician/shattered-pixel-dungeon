@@ -141,7 +141,7 @@ public class NoosaScript extends Script {
 		buffer.release();
 		
 		Gdx.gl20.glDrawElements( Gdx.gl20.GL_TRIANGLES, Quad.SIZE * length, Gdx.gl20.GL_UNSIGNED_SHORT, Quad.SIZE * Short.SIZE/8 * offset );
-	}
+	} //mod: rendering HERE
 	
 	public void lighting( float rm, float gm, float bm, float am, float ra, float ga, float ba, float aa ) {
 		uColorM.value4f( rm, gm, bm, am );

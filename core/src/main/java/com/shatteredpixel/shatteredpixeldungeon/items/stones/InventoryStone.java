@@ -22,12 +22,14 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.stones;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.Bag;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndBag;
 import com.watabou.noosa.audio.Sample;
 
@@ -49,11 +51,16 @@ public abstract class InventoryStone extends Runestone {
 	}
 	
 	@Override
-	public void execute(Hero hero, String action) {
+	public boolean execute(Hero hero, String action) {
 		super.execute(hero, action);
-		if (action.equals(AC_USE)){
-			activate(curUser.pos);
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
+			if (action.equals(AC_USE)) {
+				activate(curUser.pos);
+			}
 		}
+		return true;
 	}
 	
 	@Override

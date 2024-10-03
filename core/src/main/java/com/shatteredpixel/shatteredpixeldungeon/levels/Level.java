@@ -309,7 +309,7 @@ public abstract class Level implements Bundlable {
 		
 		PathFinder.setMapSize(w, h);
 	}
-	
+
 	public void reset() {
 		
 		for (Mob mob : mobs.toArray( new Mob[0] )) {

@@ -142,13 +142,13 @@ public class DriedRose extends Artifact {
 	}
 
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute(hero, action);
 
 		if (action.equals(AC_SUMMON)) {
 
-			if (hero.buff(MagicImmune.class) != null) return;
+			if (hero.buff(MagicImmune.class) != null) return true;
 
 			if (!Ghost.Quest.completed())   GameScene.show(new WndUseItem(null, this));
 			else if (ghost != null)         GLog.i( Messages.get(this, "spawned") );
@@ -216,6 +216,7 @@ public class DriedRose extends Artifact {
 		} else if (action.equals(AC_OUTFIT)){
 			GameScene.show( new WndGhostHero(this) );
 		}
+		return true;
 	}
 	
 	public int ghostStrength(){

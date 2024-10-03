@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.spells;
 
 
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
@@ -29,6 +30,8 @@ import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 
 import java.util.ArrayList;
+
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.quickslot;
 
 public abstract class Spell extends Item {
 	
@@ -47,20 +50,24 @@ public abstract class Spell extends Item {
 	}
 	
 	@Override
-	public void execute( final Hero hero, String action ) {
-		
-		super.execute( hero, action );
-		
-		if (action.equals( AC_CAST )) {
-			
-			if (curUser.buff(MagicImmune.class) != null){
-				GLog.w( Messages.get(this, "no_magic") );
-				return;
+	public boolean execute( final Hero hero, String action ) {
+
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
+
+			if (action.equals(AC_CAST)) {
+
+				if (curUser.buff(MagicImmune.class) != null) {
+					GLog.w(Messages.get(this, "no_magic"));
+					return true;
+				}
+
+				onCast(hero);
+
 			}
-			
-			onCast( hero );
-			
 		}
+		return true;
 	}
 	
 	@Override

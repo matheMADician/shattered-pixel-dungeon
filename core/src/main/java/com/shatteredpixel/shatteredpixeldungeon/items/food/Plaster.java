@@ -41,7 +41,7 @@ import com.watabou.noosa.audio.Sample;
 
 import java.util.ArrayList;
 
-public class Food extends Item {
+public class Plaster extends Item {
 
 	public static final float TIME_TO_EAT	= 3f;
 	
@@ -51,7 +51,7 @@ public class Food extends Item {
 	
 	{
 		stackable = true;
-		image = ItemSpriteSheet.RATION;
+		image = ItemSpriteSheet.PLASTER;
 
 		defaultAction = AC_EAT;
 
@@ -70,17 +70,16 @@ public class Food extends Item {
 
 		super.execute( hero, action );
 
-		if (action.equals( AC_EAT )) { //mod:TODO change the way food work
+		if (action.equals( AC_EAT )) {
 			
 			detach( hero.belongings.backpack );
 			
-			satisfy(hero);
-			GLog.i( Messages.get(this, "eat_msg") );
+			hero.HP=Math.min(hero.HP+10,hero.HT);
 			
 			hero.sprite.operate( hero.pos );
 			hero.busy();
 			SpellSprite.show( hero, SpellSprite.FOOD );
-			Sample.INSTANCE.play( Assets.Sounds.EAT );
+			Sample.INSTANCE.play( Assets.Sounds.GHOST );
 			
 			hero.spend( eatingTime() );
 
@@ -132,6 +131,6 @@ public class Food extends Item {
 	
 	@Override
 	public int value() {
-		return 10 * quantity;
+		return 100000 * quantity;
 	}
 }

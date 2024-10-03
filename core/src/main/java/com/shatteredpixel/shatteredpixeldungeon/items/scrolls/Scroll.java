@@ -64,7 +64,7 @@ public abstract class Scroll extends Item {
 	
 	public static final String AC_READ	= "READ";
 	
-	protected static final float TIME_TO_READ	= 1f;
+	protected static final float TIME_TO_READ	= 5f; //mod: reading a scroll takes time in real life, huh?
 
 	private static final LinkedHashMap<String, Integer> runes = new LinkedHashMap<String, Integer>() {
 		{
@@ -157,12 +157,12 @@ public abstract class Scroll extends Item {
 	}
 	
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
 
-		if (action.equals( AC_READ )) {
-			
+		if (action.equals( AC_READ )) { //mod: I'll make that reading takes very long.
+
 			if (hero.buff(MagicImmune.class) != null){
 				GLog.w( Messages.get(this, "no_magic") );
 			} else if (hero.buff( Blindness.class ) != null) {
@@ -174,8 +174,9 @@ public abstract class Scroll extends Item {
 			} else {
 				doRead();
 			}
-			
+
 		}
+		return true;
 	}
 	
 	public abstract void doRead();

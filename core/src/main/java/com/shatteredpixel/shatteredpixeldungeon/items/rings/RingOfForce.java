@@ -168,7 +168,7 @@ public class RingOfForce extends Ring {
 	}
 
 	@Override
-	public void execute(Hero hero, String action) {
+	public boolean execute(Hero hero, String action) {
 		if (action.equals(AC_ABILITY)){
 			if (hero.buff(BrawlersStance.class) != null){
 				hero.buff(BrawlersStance.class).detach();
@@ -187,6 +187,7 @@ public class RingOfForce extends Ring {
 		} else {
 			super.execute(hero, action);
 		}
+		return true;
 	}
 
 	@Override

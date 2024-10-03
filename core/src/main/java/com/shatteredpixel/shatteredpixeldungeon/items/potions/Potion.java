@@ -216,7 +216,7 @@ public class Potion extends Item {
 	}
 	
 	@Override
-	public void execute( final Hero hero, String action ) {
+	public boolean execute( final Hero hero, String action ) {
 
 		super.execute( hero, action );
 		
@@ -247,6 +247,7 @@ public class Potion extends Item {
 				}
 			
 		}
+		return true;
 	}
 	
 	@Override

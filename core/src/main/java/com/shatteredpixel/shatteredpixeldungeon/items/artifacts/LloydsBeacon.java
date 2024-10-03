@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.items.artifacts;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
@@ -104,87 +105,89 @@ public class LloydsBeacon extends Artifact {
 	}
 	
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
+			if (action == AC_SET || action == AC_RETURN) {
 
-		if (action == AC_SET || action == AC_RETURN) {
-			
-			if (Dungeon.bossLevel() || !Dungeon.interfloorTeleportAllowed()) {
-				hero.spend( LloydsBeacon.TIME_TO_USE );
-				GLog.w( Messages.get(this, "preventing") );
-				return;
-			}
-			
-			for (int i = 0; i < PathFinder.NEIGHBOURS8.length; i++) {
-				Char ch = Actor.findChar(hero.pos + PathFinder.NEIGHBOURS8[i]);
-				if (ch != null && ch.alignment == Char.Alignment.ENEMY) {
-					GLog.w( Messages.get(this, "creatures") );
-					return;
+				if (Dungeon.bossLevel() || !Dungeon.interfloorTeleportAllowed()) {
+					hero.spend( LloydsBeacon.TIME_TO_USE );
+					GLog.w( Messages.get(this, "preventing") );
+					return true;
+				}
+
+				for (int i = 0; i < PathFinder.NEIGHBOURS8.length; i++) {
+					Char ch = Actor.findChar(hero.pos + PathFinder.NEIGHBOURS8[i]);
+					if (ch != null && ch.alignment == Char.Alignment.ENEMY) {
+						GLog.w( Messages.get(this, "creatures") );
+						return true;
+					}
 				}
 			}
-		}
 
-		if (action == AC_ZAP ){
+			if (action == AC_ZAP ){
 
-			curUser = hero;
-			int chargesToUse = Dungeon.depth > 20 ? 2 : 1;
+				curUser = hero;
+				int chargesToUse = Dungeon.depth > 20 ? 2 : 1;
 
-			if (!isEquipped( hero )) {
-				GLog.i( Messages.get(Artifact.class, "need_to_equip") );
-				QuickSlotButton.cancel();
+				if (!isEquipped( hero )) {
+					GLog.i( Messages.get(Artifact.class, "need_to_equip") );
+					QuickSlotButton.cancel();
 
-			} else if (charge < chargesToUse) {
-				GLog.i( Messages.get(this, "no_charge") );
-				QuickSlotButton.cancel();
+				} else if (charge < chargesToUse) {
+					GLog.i( Messages.get(this, "no_charge") );
+					QuickSlotButton.cancel();
 
-			} else {
-				GameScene.selectCell(zapper);
-			}
+				} else {
+					GameScene.selectCell(zapper);
+				}
 
-		} else if (action == AC_SET) {
-			
-			returnDepth = Dungeon.depth;
-			returnPos = hero.pos;
-			
-			hero.spend( LloydsBeacon.TIME_TO_USE );
-			hero.busy();
-			
-			hero.sprite.operate( hero.pos );
-			Sample.INSTANCE.play( Assets.Sounds.BEACON );
-			
-			GLog.i( Messages.get(this, "return") );
-			
-		} else if (action == AC_RETURN) {
-			
-			if (returnDepth == Dungeon.depth) {
-				ScrollOfTeleportation.appear( hero, returnPos );
-				for(Mob m : Dungeon.level.mobs){
-					if (m.pos == hero.pos){
-						//displace mob
-						for(int i : PathFinder.NEIGHBOURS8){
-							if (Actor.findChar(m.pos+i) == null && Dungeon.level.passable[m.pos + i]){
-								m.pos += i;
-								m.sprite.point(m.sprite.worldToCamera(m.pos));
-								break;
+			} else if (action == AC_SET) {
+
+				returnDepth = Dungeon.depth;
+				returnPos = hero.pos;
+
+				hero.spend( LloydsBeacon.TIME_TO_USE );
+				hero.busy();
+
+				hero.sprite.operate( hero.pos );
+				Sample.INSTANCE.play( Assets.Sounds.BEACON );
+
+				GLog.i( Messages.get(this, "return") );
+
+			} else if (action == AC_RETURN) {
+
+				if (returnDepth == Dungeon.depth) {
+					ScrollOfTeleportation.appear(hero, returnPos);
+					for (Mob m : Dungeon.level.mobs) {
+						if (m.pos == hero.pos) {
+							//displace mob
+							for (int i : PathFinder.NEIGHBOURS8) {
+								if (Actor.findChar(m.pos + i) == null && Dungeon.level.passable[m.pos + i]) {
+									m.pos += i;
+									m.sprite.point(m.sprite.worldToCamera(m.pos));
+									break;
+								}
 							}
 						}
 					}
-				}
-				Dungeon.level.occupyCell(hero );
-				Dungeon.observe();
-				GameScene.updateFog();
-			} else {
+					Dungeon.level.occupyCell(hero);
+					Dungeon.observe();
+					GameScene.updateFog();
+				} else {
 
-				Level.beforeTransition();
-				InterlevelScene.mode = InterlevelScene.Mode.RETURN;
-				InterlevelScene.returnDepth = returnDepth;
-				InterlevelScene.returnPos = returnPos;
-				Game.switchScene( InterlevelScene.class );
+					Level.beforeTransition();
+					InterlevelScene.mode = InterlevelScene.Mode.RETURN;
+					InterlevelScene.returnDepth = returnDepth;
+					InterlevelScene.returnPos = returnPos;
+					Game.switchScene(InterlevelScene.class);
+				}
 			}
-			
-			
 		}
+		return true;
 	}
 
 	protected CellSelector.Listener zapper = new  CellSelector.Listener() {

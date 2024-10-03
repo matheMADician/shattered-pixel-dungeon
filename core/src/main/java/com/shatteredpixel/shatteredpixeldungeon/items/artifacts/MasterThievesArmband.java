@@ -79,10 +79,10 @@ public class MasterThievesArmband extends Artifact {
 	}
 
 	@Override
-	public void execute(Hero hero, String action) {
+	public boolean execute(Hero hero, String action) {
 		super.execute(hero, action);
 
-		if (hero.buff(MagicImmune.class) != null) return;
+		if (hero.buff(MagicImmune.class) != null) return true;
 
 		if (action.equals(AC_STEAL)){
 
@@ -106,6 +106,7 @@ public class MasterThievesArmband extends Artifact {
 			}
 
 		}
+		return true;
 	}
 
 	private CellSelector.Listener targeter = new CellSelector.Listener(){

@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.darts;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
@@ -37,6 +38,7 @@ import com.shatteredpixel.shatteredpixeldungeon.plants.Plant;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndBag;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.watabou.noosa.audio.Sample;
@@ -68,11 +70,15 @@ public class Dart extends MissileWeapon {
 	}
 	
 	@Override
-	public void execute(Hero hero, String action) {
-		super.execute(hero, action);
-		if (action.equals(AC_TIP)){
-			GameScene.selectItem(itemSelector);
+	public boolean execute(Hero hero, String action) {
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
+			if (action.equals(AC_TIP)) {
+				GameScene.selectItem(itemSelector);
+			}
 		}
+		return true;
 	}
 	
 	@Override

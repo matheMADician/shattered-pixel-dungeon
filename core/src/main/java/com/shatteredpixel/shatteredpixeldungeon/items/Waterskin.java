@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
@@ -78,49 +79,53 @@ public class Waterskin extends Item {
 	}
 
 	@Override
-	public void execute( final Hero hero, String action ) {
+	public boolean execute( final Hero hero, String action ) {
 
-		super.execute( hero, action );
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
 
-		if (action.equals( AC_DRINK )) {
+			if (action.equals(AC_DRINK)) {
 
-			if (volume > 0) {
-				
-				float missingHealthPercent = 1f - (hero.HP / (float)hero.HT);
+				if (volume > 0) {
 
-				int curShield = 0;
-				if (hero.buff(Barrier.class) != null) curShield = hero.buff(Barrier.class).shielding();
-				int maxShield = Math.round(hero.HT *0.2f*hero.pointsInTalent(Talent.SHIELDING_DEW));
-				if (hero.hasTalent(Talent.SHIELDING_DEW)){
-					float missingShieldPercent = 1f - (curShield / (float)maxShield);
-					missingShieldPercent *= 0.2f*hero.pointsInTalent(Talent.SHIELDING_DEW);
-					if (missingShieldPercent > 0){
-						missingHealthPercent += missingShieldPercent;
+					float missingHealthPercent = 1f - (hero.HP / (float) hero.HT);
+
+					int curShield = 0;
+					if (hero.buff(Barrier.class) != null) curShield = hero.buff(Barrier.class).shielding();
+					int maxShield = Math.round(hero.HT * 0.2f * hero.pointsInTalent(Talent.SHIELDING_DEW));
+					if (hero.hasTalent(Talent.SHIELDING_DEW)) {
+						float missingShieldPercent = 1f - (curShield / (float) maxShield);
+						missingShieldPercent *= 0.2f * hero.pointsInTalent(Talent.SHIELDING_DEW);
+						if (missingShieldPercent > 0) {
+							missingHealthPercent += missingShieldPercent;
+						}
 					}
+
+					//trimming off 0.01 drops helps with floating point errors
+					int dropsNeeded = (int) Math.ceil((missingHealthPercent / 0.05f) - 0.01f);
+					dropsNeeded = (int) GameMath.gate(1, dropsNeeded, volume);
+
+					if (Dewdrop.consumeDew(dropsNeeded, hero, true)) {
+						volume -= dropsNeeded;
+
+						hero.spend(TIME_TO_DRINK);
+						hero.busy();
+
+						Sample.INSTANCE.play(Assets.Sounds.DRINK);
+						hero.sprite.operate(hero.pos);
+
+						updateQuickslot();
+					}
+
+
+				} else {
+					GLog.w(Messages.get(this, "empty"));
 				}
-				
-				//trimming off 0.01 drops helps with floating point errors
-				int dropsNeeded = (int)Math.ceil((missingHealthPercent / 0.05f) - 0.01f);
-				dropsNeeded = (int)GameMath.gate(1, dropsNeeded, volume);
 
-				if (Dewdrop.consumeDew(dropsNeeded, hero, true)){
-					volume -= dropsNeeded;
-
-					hero.spend(TIME_TO_DRINK);
-					hero.busy();
-
-					Sample.INSTANCE.play(Assets.Sounds.DRINK);
-					hero.sprite.operate(hero.pos);
-
-					updateQuickslot();
-				}
-
-
-			} else {
-				GLog.w( Messages.get(this, "empty") );
 			}
-
 		}
+		return true;
 	}
 
 	@Override

@@ -68,7 +68,7 @@ public class Ankh extends Item {
 	}
 
 	@Override
-	public void execute( final Hero hero, String action ) {
+	public boolean execute( final Hero hero, String action ) {
 
 		super.execute( hero, action );
 
@@ -88,6 +88,7 @@ public class Ankh extends Item {
 				hero.sprite.operate( hero.pos );
 			}
 		}
+		return true;
 	}
 	
 	@Override

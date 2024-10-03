@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -41,12 +42,15 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Projecting;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.darts.Dart;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
 
 import java.util.ArrayList;
+
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.quickslot;
 
 abstract public class MissileWeapon extends Weapon {
 
@@ -150,7 +154,38 @@ abstract public class MissileWeapon extends Weapon {
 		actions.remove( AC_EQUIP );
 		return actions;
 	}
-	
+
+	//mod: change that throwing weapons have to be on quickslot to be thrown-----------------------------------------vvv
+	@Override
+	public boolean execute( Hero hero, String action ) { //mod:changed to int to detect hotbar
+
+		GameScene.cancel();
+		curUser = hero;
+		curItem = this;
+
+		if (action.equals( AC_DROP )) {
+
+			if (hero.belongings.backpack.contains(this) || isEquipped(hero)) {
+				doDrop(hero);
+				return true;
+			}
+		}
+		else if (!quickslot.contains(this)) {
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else{
+
+			if (action.equals(AC_THROW)) {
+
+				if (hero.belongings.backpack.contains(this) || isEquipped(hero)) {
+					doThrow(hero);
+					return true;
+				}
+			}
+		}
+		return quickslot.contains(this);
+	}
+	//mod: ----------------------------------------------------------------------------------------------------------^^^
+
 	@Override
 	public boolean collect(Bag container) {
 		if (container instanceof MagicalHolster) holster = true;

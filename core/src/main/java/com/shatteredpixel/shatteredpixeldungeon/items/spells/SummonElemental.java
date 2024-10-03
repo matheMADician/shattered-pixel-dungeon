@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.items.spells;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AllyBuff;
@@ -75,12 +76,16 @@ public class SummonElemental extends Spell {
 	}
 
 	@Override
-	public void execute(Hero hero, String action) {
-		super.execute(hero, action);
+	public boolean execute(Hero hero, String action) {
 
-		if (action.equals(AC_IMBUE)){
-			GameScene.selectItem(selector);
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			//GLog.i(Messages.get(QuickSlot.class , "warning")); //already done in Spell.java
+		}else {
+			if (action.equals(AC_IMBUE)) {
+				GameScene.selectItem(selector);
+			}
 		}
+		return true;
 	}
 
 	@Override

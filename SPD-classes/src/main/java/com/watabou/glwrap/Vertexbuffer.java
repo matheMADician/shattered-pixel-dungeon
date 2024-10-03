@@ -72,7 +72,7 @@ public class Vertexbuffer {
 			updateEnd = Math.max(end, updateEnd);
 	}
 
-	public void updateGLData(){
+	public void updateGLData(){ //mod: FIXME the problem is here
 		if (updateStart == -1) return;
 
 		((Buffer)vertices).position(updateStart);

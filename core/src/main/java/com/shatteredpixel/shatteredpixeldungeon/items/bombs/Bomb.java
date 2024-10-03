@@ -21,10 +21,7 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.bombs;
 
-import com.shatteredpixel.shatteredpixeldungeon.Assets;
-import com.shatteredpixel.shatteredpixeldungeon.Badges;
-import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
-import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
+import com.shatteredpixel.shatteredpixeldungeon.*;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -96,15 +93,17 @@ public class Bomb extends Item {
 	}
 
 	@Override
-	public void execute(Hero hero, String action) {
-
-		if (action.equals(AC_LIGHTTHROW)) {
-			lightingFuse = true;
-			action = AC_THROW;
-		} else
-			lightingFuse = false;
-
-		super.execute(hero, action);
+	public boolean execute(Hero hero, String action) {
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
+			if (action.equals(AC_LIGHTTHROW)) {
+				lightingFuse = true;
+				action = AC_THROW;
+			} else
+				lightingFuse = false;
+		}
+		return true;
 	}
 
 	protected Fuse createFuse(){

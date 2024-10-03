@@ -60,7 +60,7 @@ public class KingsCrown extends Item {
 	}
 	
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
 
@@ -74,6 +74,7 @@ public class KingsCrown extends Item {
 			}
 			
 		}
+		return true;
 	}
 	
 	@Override

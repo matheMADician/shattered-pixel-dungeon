@@ -87,7 +87,7 @@ public class PathFinder {
 		// until we reach the ending point
 		do {
 			int minD = distance[s];
-			int mins = s;
+			int mins = s; //s=from
 			
 			for (int i=0; i < dir.length; i++) {
 				

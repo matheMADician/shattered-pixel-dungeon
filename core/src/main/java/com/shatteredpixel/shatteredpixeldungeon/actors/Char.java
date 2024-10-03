@@ -125,6 +125,7 @@ import com.shatteredpixel.shatteredpixeldungeon.plants.Swiftthistle;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.shatteredpixel.shatteredpixeldungeon.tiles.DungeonTilemap;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.BArray;
 import com.watabou.utils.Bundlable;
@@ -271,7 +272,11 @@ public abstract class Char extends Actor {
 		
 		c.spend( 1 / c.speed() );
 
+
 		if (c == Dungeon.hero){
+
+			GameScene.updateMap();
+
 			if (Dungeon.hero.subClass == HeroSubClass.FREERUNNER){
 				Buff.affect(Dungeon.hero, Momentum.class).gainStack();
 			}

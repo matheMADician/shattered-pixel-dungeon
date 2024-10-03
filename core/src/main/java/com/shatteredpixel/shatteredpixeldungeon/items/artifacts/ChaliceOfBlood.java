@@ -67,7 +67,7 @@ public class ChaliceOfBlood extends Artifact {
 	}
 
 	@Override
-	public void execute(Hero hero, String action ) {
+	public boolean execute(Hero hero, String action ) {
 		super.execute(hero, action);
 
 		if (action.equals(AC_PRICK)){
@@ -94,6 +94,7 @@ public class ChaliceOfBlood extends Artifact {
 				prick(hero);
 			}
 		}
+		return true;
 	}
 
 	private void prick(Hero hero){

@@ -23,20 +23,25 @@ package com.shatteredpixel.shatteredpixeldungeon.items;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Bee;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Pushing;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Splash;
+import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.noosa.tweeners.AlphaTweener;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
 
 import java.util.ArrayList;
+
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.quickslot;
 
 public class Honeypot extends Item {
 	
@@ -59,27 +64,31 @@ public class Honeypot extends Item {
 	}
 	
 	@Override
-	public void execute( final Hero hero, String action ) {
+	public boolean execute( final Hero hero, String action ) {
 
-		super.execute( hero, action );
+		if(! super.execute( hero, action )){ //mod: if the hero didn't drop, throw, or if the item is not in hotbar
+			GLog.i(Messages.get(QuickSlot.class , "warning"));
+		}else {
 
-		if (action.equals( AC_SHATTER )) {
-			
-			hero.sprite.zap( hero.pos );
-			
-			detach( hero.belongings.backpack );
+			if (action.equals(AC_SHATTER)) {
 
-			Item item = shatter( hero, hero.pos );
-			if (!item.collect()){
-				Dungeon.level.drop(item, hero.pos);
-				if (item instanceof ShatteredPot){
-					((ShatteredPot) item).dropPot(hero, hero.pos);
+				hero.sprite.zap(hero.pos);
+
+				detach(hero.belongings.backpack);
+
+				Item item = shatter(hero, hero.pos);
+				if (!item.collect()) {
+					Dungeon.level.drop(item, hero.pos);
+					if (item instanceof ShatteredPot) {
+						((ShatteredPot) item).dropPot(hero, hero.pos);
+					}
 				}
+
+				hero.next();
+
 			}
-
-			hero.next();
-
 		}
+		return true;
 	}
 	
 	@Override

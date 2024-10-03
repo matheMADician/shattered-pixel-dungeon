@@ -36,12 +36,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.particles.LeafParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfSharpshooting;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.plants.Blindweed;
-import com.shatteredpixel.shatteredpixeldungeon.plants.Firebloom;
-import com.shatteredpixel.shatteredpixeldungeon.plants.Icecap;
-import com.shatteredpixel.shatteredpixeldungeon.plants.Plant;
-import com.shatteredpixel.shatteredpixeldungeon.plants.Sorrowmoss;
-import com.shatteredpixel.shatteredpixeldungeon.plants.Stormvine;
+import com.shatteredpixel.shatteredpixeldungeon.plants.*;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
@@ -58,7 +53,7 @@ import java.util.ArrayList;
 
 import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.quickslot;
 
-public class SpiritBow extends Weapon {
+public class Tommygun extends Weapon {
 	
 	public static final String AC_SHOOT		= "SHOOT";
 	
@@ -82,7 +77,7 @@ public class SpiritBow extends Weapon {
 		actions.add(AC_SHOOT);
 		return actions;
 	}
-
+	
 	@Override
 	public boolean execute(Hero hero, String action) {
 		super.execute( hero, action );
@@ -146,7 +141,7 @@ public class SpiritBow extends Weapon {
 	public String info() {
 		String info = desc();
 		
-		info += "\n\n" + Messages.get( SpiritBow.class, "stats",
+		info += "\n\n" + Messages.get( Tommygun.class, "stats",
 				Math.round(augment.damageFactor(min())),
 				Math.round(augment.damageFactor(max())),
 				STRReq());
@@ -218,7 +213,7 @@ public class SpiritBow extends Weapon {
 	
 	@Override
 	public int damageRoll(Char owner) {
-		int damage = augment.damageFactor(super.damageRoll(owner));
+		int damage = augment.damageFactor(super.damageRoll(owner))+100;
 		
 		if (owner instanceof Hero) {
 			int exStr = ((Hero)owner).STR() - STRReq();
@@ -321,27 +316,27 @@ public class SpiritBow extends Weapon {
 
 		@Override
 		public int damageRoll(Char owner) {
-			return SpiritBow.this.damageRoll(owner);
+			return Tommygun.this.damageRoll(owner);
 		}
 		
 		@Override
 		public boolean hasEnchant(Class<? extends Enchantment> type, Char owner) {
-			return SpiritBow.this.hasEnchant(type, owner);
+			return Tommygun.this.hasEnchant(type, owner);
 		}
 		
 		@Override
 		public int proc(Char attacker, Char defender, int damage) {
-			return SpiritBow.this.proc(attacker, defender, damage);
+			return Tommygun.this.proc(attacker, defender, damage);
 		}
 		
 		@Override
 		public float delayFactor(Char user) {
-			return SpiritBow.this.delayFactor(user);
+			return Tommygun.this.delayFactor(user);
 		}
 		
 		@Override
 		public float accuracyFactor(Char owner, Char target) {
-			if (sniperSpecial && SpiritBow.this.augment == Augment.DAMAGE){
+			if (sniperSpecial && Tommygun.this.augment == Augment.DAMAGE){
 				return Float.POSITIVE_INFINITY;
 			} else {
 				return super.accuracyFactor(owner, target);
@@ -350,7 +345,7 @@ public class SpiritBow extends Weapon {
 		
 		@Override
 		public int STRReq(int lvl) {
-			return SpiritBow.this.STRReq();
+			return Tommygun.this.STRReq();
 		}
 
 		@Override
@@ -363,7 +358,7 @@ public class SpiritBow extends Weapon {
 				if (!curUser.shoot( enemy, this )) {
 					Splash.at(cell, 0xCC99FFFF, 1);
 				}
-				if (sniperSpecial && SpiritBow.this.augment != Augment.SPEED) sniperSpecial = false;
+				if (sniperSpecial && Tommygun.this.augment != Augment.SPEED) sniperSpecial = false;
 			}
 		}
 
@@ -378,8 +373,8 @@ public class SpiritBow extends Weapon {
 		@Override
 		public void cast(final Hero user, final int dst) {
 			final int cell = throwPos( user, dst );
-			SpiritBow.this.targetPos = cell;
-			if (sniperSpecial && SpiritBow.this.augment == Augment.SPEED){
+			Tommygun.this.targetPos = cell;
+			if (sniperSpecial && Tommygun.this.augment == Augment.SPEED){
 				if (flurryCount == -1) flurryCount = 3;
 				
 				final Char enemy = Actor.findChar( cell );
@@ -484,7 +479,7 @@ public class SpiritBow extends Weapon {
 		}
 		@Override
 		public String prompt() {
-			return Messages.get(SpiritBow.class, "prompt");
+			return Messages.get(Tommygun.class, "prompt");
 		}
 	};
 }

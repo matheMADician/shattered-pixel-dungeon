@@ -253,6 +253,7 @@ public class WndSettings extends WndTabbed {
 			}
 			add(chkFullscreen);
 
+
 			if (DeviceCompat.isAndroid() && PixelScene.maxScreenZoom >= 2) {
 				chkSaver = new CheckBox(Messages.get(this, "saver")) {
 					@Override

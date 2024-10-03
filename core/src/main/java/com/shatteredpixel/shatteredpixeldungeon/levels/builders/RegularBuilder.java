@@ -49,7 +49,10 @@ public abstract class RegularBuilder extends Builder {
 	}
 	
 	//path length is the percentage of pathable rooms that are on the main path
-	protected float pathLength = 0.25f;
+	//protected float pathLength = 0.25f;
+
+	protected float pathLength = 0.1f;
+
 	//The chance weights for extra rooms to be added to the path
 	protected float[] pathLenJitterChances = new float[]{0, 0, 0, 1};
 	//default is 25% of multi connection rooms, plus 3

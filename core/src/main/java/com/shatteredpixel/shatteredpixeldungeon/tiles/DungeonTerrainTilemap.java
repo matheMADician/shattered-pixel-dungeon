@@ -43,6 +43,7 @@ public class DungeonTerrainTilemap extends DungeonTilemap {
 		int visual = DungeonTileSheet.directVisuals.get(tile, -1);
 		if (visual != -1) return DungeonTileSheet.getVisualWithAlts(visual, pos);
 
+
 		if (tile == Terrain.WATER) {
 			return DungeonTileSheet.stitchWaterTile(
 					map[pos + PathFinder.CIRCLE4[0]],
@@ -50,6 +51,8 @@ public class DungeonTerrainTilemap extends DungeonTilemap {
 					map[pos + PathFinder.CIRCLE4[2]],
 					map[pos + PathFinder.CIRCLE4[3]]
 			);
+
+
 
 		} else if (tile == Terrain.CHASM) {
 			return DungeonTileSheet.stitchChasmTile( pos > mapWidth ? map[pos - mapWidth] : -1);
@@ -109,6 +112,6 @@ public class DungeonTerrainTilemap extends DungeonTilemap {
 
 	@Override
 	protected boolean needsRender(int pos) {
-		return super.needsRender(pos) && data[pos] != DungeonTileSheet.WATER;
+		return super.needsRender(pos) && data[pos] != DungeonTileSheet.WATER; //mod: TODO the reason why it's water
 	}
 }

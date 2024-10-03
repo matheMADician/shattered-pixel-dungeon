@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.levels.painters;
 
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
+import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.levels.rooms.Room;
 import com.watabou.utils.Point;
 import com.watabou.utils.Rect;
@@ -60,7 +61,7 @@ public abstract class Painter {
 			Arrays.fill( level.map, pos, pos + w, value );
 		}
 	}
-	
+
 	public static void fill( Level level, Rect rect, int value ) {
 		fill( level, rect.left, rect.top, rect.width(), rect.height(), value );
 	}
@@ -72,7 +73,32 @@ public abstract class Painter {
 	public static void fill( Level level, Rect rect, int l, int t, int r, int b, int value ) {
 		fill( level, rect.left + l, rect.top + t, rect.width() - (l + r), rect.height() - (t + b), value );
 	}
-	
+
+	//mod: generation used to fill with mask----------------------------------------------------------------------------
+	public static void fill( Level level, Rect rect, int m, int value, int[]mask ) {
+		fill( level, rect.left + m, rect.top + m, rect.width() - m*2, rect.height() - m*2, value, mask );
+	}
+	public static void fill( Level level, Rect rect, int value, int[]mask ) {
+		fill( level, rect.left, rect.top, rect.width(), rect.height(), value, mask );
+	}
+
+	public static void fill( Level level, int x, int y, int w, int h, int value, int[]mask) {
+
+		int width = level.width();
+
+		int pos = y * width + x;
+		for (int i=y; i < y + h; i++) {
+			for(int j=x; j < x + w; j++){
+				for( int k : mask ){
+					if(level.map[ i * width + j ] == k) break;
+				}
+				level.map[ i * width + j ] = value;
+			}
+		}
+	}
+
+	//mod: -------------------------------------------------------------------------------------------------------------
+
 	public static void drawLine( Level level, Point from, Point to, int value){
 		float x = from.x;
 		float y = from.y;
@@ -160,7 +186,29 @@ public abstract class Painter {
 		}
 
 	}
-	
+
+	//mod: generation mask variation------------------------------------------------------------------------------------
+	public static void fillDiamond(Level level, Rect rect, int m, int value, int[] mask ) {
+		fillDiamond( level, rect.left + m, rect.top + m, rect.width() - m*2, rect.height() - m*2, value, mask );
+	}
+	public static void fillDiamond(Level level, Rect rect, int value, int[] mask ) {
+		fillDiamond( level, rect.left, rect.top, rect.width(), rect.height(), value, mask );
+	}
+	public static void fillDiamond(Level level, int x, int y, int w, int h, int value, int[] mask){
+
+		//we want the end width to be w, and the width will grow by a total of (h-2 - h%2)
+		int diamondWidth = w - (h-2 - h%2);
+		//but starting width cannot be smaller than 2 on even width, 3 on odd width.
+		diamondWidth = Math.max(diamondWidth, w%2 == 0 ? 2 : 3);
+
+		for (int i = 0; i <= h; i++){
+			Painter.fill( level, x + (w - diamondWidth)/2, y+i, diamondWidth, h-2*i, value, mask);
+			diamondWidth += 2;
+			if (diamondWidth > w) break;
+		}
+	}
+	//mod: -------------------------------------------------------------------------------------------------------------
+
 	public static Point drawInside( Level level, Room room, Point from, int n, int value ) {
 		
 		Point step = new Point();

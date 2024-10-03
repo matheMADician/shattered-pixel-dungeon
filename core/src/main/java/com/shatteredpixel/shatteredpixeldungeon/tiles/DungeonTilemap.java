@@ -22,6 +22,7 @@
 package com.shatteredpixel.shatteredpixeldungeon.tiles;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.watabou.noosa.Image;
 import com.watabou.noosa.TextureFilm;
 import com.watabou.noosa.Tilemap;
@@ -30,14 +31,23 @@ import com.watabou.utils.GameMath;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.PointF;
 
+import com.shatteredpixel.shatteredpixeldungeon.levels.painters.RegularPainter;
+
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.hero;
+
 public abstract class DungeonTilemap extends Tilemap {
 
 	public static final int SIZE = 16;
 
 	protected int[] map;
 
+
+	private static int width;
+
 	public DungeonTilemap(String tex) {
+
 		super(tex, new TextureFilm( tex, SIZE, SIZE ) );
+
 	}
 
 	@Override
@@ -48,12 +58,37 @@ public abstract class DungeonTilemap extends Tilemap {
 		super.map(new int[data.length], cols);
 	}
 
+	private boolean first = true;
+	//mod: chunkloading-------------------------------------------------------------------------------------------------
 	@Override
 	public synchronized void updateMap() {
+		if (first){
+			updateFullMap();
+			first = false;
+		}else {
+
+			for (int i = (HeroY / ChunkSize == 0) ? 0 : ChunkSize * (HeroY / ChunkSize - 1);
+				 i < ((HeroY / ChunkSize == ChunkNumY - 1) ? width : ChunkSize * (HeroY / ChunkSize + 1)); i++) {
+				for (int j = (HeroX / ChunkSize == 0) ? 0 : ChunkSize * (HeroX / ChunkSize - 1);
+					 j < ((HeroX / ChunkSize == ChunkNumX - 1) ? width : ChunkSize * (HeroX / ChunkSize + 1)); j++) {
+					data[i * width + j] = getTileVisual(i * width + j, map[i * width + j], false);
+				}
+			}
+		}
+		/*
+		for (int i = 0; i < data.length; i++)
+			data[i] = getTileVisual(i ,map[i], false);
+		super.updateMap();
+		*/
+	}
+
+	public synchronized void updateFullMap() { //mod: used only for the time map was created
 		for (int i = 0; i < data.length; i++)
 			data[i] = getTileVisual(i ,map[i], false);
 		super.updateMap();
 	}
+
+	//mod: -------------------------------------------------------------------------------------------------------------
 
 	@Override
 	public synchronized void updateMapCell(int cell) {

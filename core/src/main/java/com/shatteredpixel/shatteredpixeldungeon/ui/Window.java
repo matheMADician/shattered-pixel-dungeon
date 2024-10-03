@@ -65,7 +65,7 @@ public class Window extends Group implements Signal.Listener<KeyEvent> {
 		
 		blocker = new PointerArea( 0, 0, PixelScene.uiCamera.width, PixelScene.uiCamera.height ) {
 			@Override
-			protected void onClick( PointerEvent event ) {
+			protected void onClick( PointerEvent event ) { //triggered when the screen is clicked
 				if (Window.this.parent != null && !Window.this.chrome.overlapsScreenPoint(
 					(int) event.current.x,
 					(int) event.current.y )) {

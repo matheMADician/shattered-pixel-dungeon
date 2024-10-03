@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArtifactRecharge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -59,6 +60,8 @@ import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
 
 import java.util.ArrayList;
+
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.quickslot;
 
 public class MagesStaff extends MeleeWeapon {
 
@@ -133,9 +136,14 @@ public class MagesStaff extends MeleeWeapon {
 	}
 
 	@Override
-	public void execute(Hero hero, String action) {
+	public boolean execute(Hero hero, String action) {
 
 		super.execute(hero, action);
+
+		if (!(quickslot.contains(this) || this.isEquipped(hero))){//mod: make that only quickslot items can be accessed
+			GLog.i(Messages.get(QuickSlot.class , "warning")); //mod: in this case, equipping does too
+			return true;
+		}
 
 		if (action.equals(AC_IMBUE)) {
 
@@ -146,13 +154,14 @@ public class MagesStaff extends MeleeWeapon {
 
 			if (wand == null) {
 				GameScene.show(new WndUseItem(null, this));
-				return;
+				return true;
 			}
 
 			if (cursed || hasCurseEnchant()) wand.cursed = true;
 			else                             wand.cursed = false;
 			wand.execute(hero, AC_ZAP);
 		}
+		return true;
 	}
 
 	@Override

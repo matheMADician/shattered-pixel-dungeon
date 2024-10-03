@@ -468,6 +468,8 @@ public class Dungeon {
 		}
 		
 		PathFinder.setMapSize(level.width(), level.height());
+
+		GameScene.tiles.UpdateMapSize( level.width(), level.height() );//mod: rendering
 		
 		Dungeon.level = level;
 		hero.pos = pos;

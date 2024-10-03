@@ -137,10 +137,10 @@ public class SandalsOfNature extends Artifact {
 	}
 
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 		super.execute(hero, action);
 
-		if (hero.buff(MagicImmune.class) != null) return;
+		if (hero.buff(MagicImmune.class) != null) return true;
 
 		if (action.equals(AC_FEED)){
 
@@ -155,6 +155,7 @@ public class SandalsOfNature extends Artifact {
 				GameScene.selectCell(cellSelector);
 			}
 		}
+		return true;
 	}
 
 	@Override

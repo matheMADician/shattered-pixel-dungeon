@@ -83,11 +83,11 @@ public class EtherealChains extends Artifact {
 	}
 
 	@Override
-	public void execute(Hero hero, String action) {
+	public boolean execute(Hero hero, String action) {
 
 		super.execute(hero, action);
 
-		if (hero.buff(MagicImmune.class) != null) return;
+		if (hero.buff(MagicImmune.class) != null) return true;
 
 		if (action.equals(AC_CAST)){
 
@@ -111,6 +111,7 @@ public class EtherealChains extends Artifact {
 			}
 
 		}
+		return true;
 	}
 
 	private CellSelector.Listener caster = new CellSelector.Listener(){

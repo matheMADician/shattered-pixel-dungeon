@@ -104,7 +104,7 @@ public class BrokenSeal extends Item {
 	}
 
 	@Override
-	public void execute(Hero hero, String action) {
+	public boolean execute(Hero hero, String action) {
 
 		super.execute(hero, action);
 
@@ -114,6 +114,7 @@ public class BrokenSeal extends Item {
 		} else if (action.equals(AC_INFO)) {
 			GameScene.show(new WndUseItem(null, this));
 		}
+		return true;
 	}
 
 	@Override

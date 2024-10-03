@@ -106,11 +106,11 @@ public class UnstableSpellbook extends Artifact {
 	}
 
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
 
-		if (hero.buff(MagicImmune.class) != null) return;
+		if (hero.buff(MagicImmune.class) != null) return true;
 
 		if (action.equals( AC_READ )) {
 
@@ -180,6 +180,7 @@ public class UnstableSpellbook extends Artifact {
 		} else if (action.equals( AC_ADD )) {
 			GameScene.selectItem(itemSelector);
 		}
+		return true;
 	}
 
 	//forces the reading of a regular scroll if the player tried to exploit by quitting the game when the menu was up

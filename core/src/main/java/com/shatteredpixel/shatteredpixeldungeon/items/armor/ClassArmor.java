@@ -175,7 +175,7 @@ abstract public class ClassArmor extends Armor {
 	}
 
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		super.execute( hero, action );
 
@@ -280,6 +280,8 @@ abstract public class ClassArmor extends Armor {
 			});
 
 		}
+
+		return true;
 	}
 
 	@Override

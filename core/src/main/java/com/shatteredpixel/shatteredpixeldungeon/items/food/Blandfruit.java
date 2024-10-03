@@ -93,19 +93,19 @@ public class Blandfruit extends Food {
 	}
 
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) {
 
 		if (action.equals( Potion.AC_CHOOSE )){
 
 			GameScene.show(new WndUseItem(null, this) );
-			return;
+			return true;
 
 		}
 
 		if (action.equals( AC_EAT ) && potionAttrib == null) {
 
 			GLog.w( Messages.get(this, "raw"));
-			return;
+			return true;
 
 		}
 
@@ -116,6 +116,7 @@ public class Blandfruit extends Food {
 			potionAttrib.apply(hero);
 
 		}
+		return true;
 	}
 
 	@Override

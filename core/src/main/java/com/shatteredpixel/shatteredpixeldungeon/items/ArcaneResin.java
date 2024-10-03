@@ -62,7 +62,7 @@ public class ArcaneResin extends Item {
 	}
 
 	@Override
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) { //mod: no need to be so strict on this
 
 		super.execute( hero, action );
 
@@ -72,6 +72,7 @@ public class ArcaneResin extends Item {
 			GameScene.selectItem( itemSelector );
 
 		}
+		return true;
 	}
 
 	@Override

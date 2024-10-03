@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.items;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Blindness;
@@ -44,6 +45,7 @@ import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.MissileSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.QuickSlotButton;
+import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.noosa.particles.Emitter;
 import com.watabou.utils.Bundlable;
@@ -55,15 +57,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import static com.shatteredpixel.shatteredpixeldungeon.Dungeon.quickslot;
+
 public class Item implements Bundlable {
 
 	protected static final String TXT_TO_STRING_LVL		= "%s %+d";
 	protected static final String TXT_TO_STRING_X		= "%s x%d";
 	
-	protected static final float TIME_TO_THROW		= 1.0f;
-	protected static final float TIME_TO_PICK_UP	= 1.0f;
-	protected static final float TIME_TO_DROP		= 1.0f;
-	
+	protected static final float TIME_TO_THROW		= 2.0f;
+	protected static final float TIME_TO_PICK_UP	= 2.0f;
+	protected static final float TIME_TO_DROP		= 2.0f;
+
+	//mod: by adding time, punishes sorting inventory during combat
+
 	public static final String AC_DROP		= "DROP";
 	public static final String AC_THROW		= "THROW";
 	
@@ -149,7 +155,7 @@ public class Item implements Bundlable {
 		GameScene.selectCell(thrower);
 	}
 	
-	public void execute( Hero hero, String action ) {
+	public boolean execute( Hero hero, String action ) { //mod:changed to int to detect hotbar
 
 		GameScene.cancel();
 		curUser = hero;
@@ -159,15 +165,17 @@ public class Item implements Bundlable {
 			
 			if (hero.belongings.backpack.contains(this) || isEquipped(hero)) {
 				doDrop(hero);
+				return true;
 			}
 			
 		} else if (action.equals( AC_THROW )) {
 			
 			if (hero.belongings.backpack.contains(this) || isEquipped(hero)) {
 				doThrow(hero);
+				return true;
 			}
-			
 		}
+		return quickslot.contains(this);
 	}
 
 	//can be overridden if default action is variable
@@ -175,11 +183,12 @@ public class Item implements Bundlable {
 		return defaultAction;
 	}
 	
-	public void execute( Hero hero ) {
+	public boolean execute( Hero hero ) {
 		String action = defaultAction();
 		if (action != null) {
 			execute(hero, defaultAction());
 		}
+		return true;
 	}
 	
 	protected void onThrow( int cell ) {
@@ -261,7 +270,7 @@ public class Item implements Bundlable {
 		}
 
 		items.add( this );
-		Dungeon.quickslot.replacePlaceholder(this);
+		quickslot.replacePlaceholder(this);
 		Collections.sort( items, itemComparator );
 		updateQuickslot();
 		return true;
@@ -273,6 +282,7 @@ public class Item implements Bundlable {
 	}
 	
 	//returns a new item if the split was sucessful and there are now 2 items, otherwise null
+	//mod: yoooo Evan Debenham you spelled successful wrong
 	public Item split( int amount ){
 		if (amount <= 0 || amount >= quantity()) {
 			return null;
@@ -304,7 +314,7 @@ public class Item implements Bundlable {
 		if (quantity == 1) {
 
 			if (stackable){
-				Dungeon.quickslot.convertToPlaceholder(this);
+				quickslot.convertToPlaceholder(this);
 			}
 
 			return detachAll( container );
@@ -321,7 +331,7 @@ public class Item implements Bundlable {
 	}
 	
 	public final Item detachAll( Bag container ) {
-		Dungeon.quickslot.clearItem( this );
+		quickslot.clearItem( this );
 
 		for (Item item : container.items) {
 			if (item == this) {
@@ -553,8 +563,8 @@ public class Item implements Bundlable {
 		bundle.put( LEVEL_KNOWN, levelKnown );
 		bundle.put( CURSED, cursed );
 		bundle.put( CURSED_KNOWN, cursedKnown );
-		if (Dungeon.quickslot.contains(this)) {
-			bundle.put( QUICKSLOT, Dungeon.quickslot.getSlot(this) );
+		if (quickslot.contains(this)) {
+			bundle.put( QUICKSLOT, quickslot.getSlot(this) );
 		}
 		bundle.put( KEPT_LOST, keptThoughLostInvent );
 	}
@@ -577,7 +587,7 @@ public class Item implements Bundlable {
 		//only want to populate slot on first load.
 		if (Dungeon.hero == null) {
 			if (bundle.contains(QUICKSLOT)) {
-				Dungeon.quickslot.setSlot(bundle.getInt(QUICKSLOT), this);
+				quickslot.setSlot(bundle.getInt(QUICKSLOT), this);
 			}
 		}
 
